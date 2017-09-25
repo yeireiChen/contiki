@@ -16,6 +16,8 @@
 
 #define UIP_CONF_ROUTER 1
 
+// #define TIMESYNCH_CONF_ENABLED 1
+
 // #define TSCH_CONF_DEFAULT_HOPPING_SEQUENCE (uint8_t[]){ 12, 16, 20, 24 }
 #define TSCH_CONF_DEFAULT_HOPPING_SEQUENCE (uint8_t[]){ 14, 18, 22, 26 }
 

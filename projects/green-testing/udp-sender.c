@@ -96,6 +96,7 @@ tcpip_handler(void)
 void
 collect_common_send(void)
 {
+  tsch_schedule_print();
   static uint8_t seqno;
   struct {
     uint8_t seqno;
