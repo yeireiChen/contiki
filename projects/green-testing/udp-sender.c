@@ -40,6 +40,9 @@
 #endif
 #include "collect-common.h"
 #include "collect-view.h"
+#if WITH_ORCHESTRA
+#include "orchestra.h"
+#endif /* WITH_ORCHESTRA */
 
 #include <stdio.h>
 #include <string.h>
@@ -224,6 +227,10 @@ PROCESS_THREAD(udp_client_process, ev, data)
   PRINT6ADDR(&client_conn->ripaddr);
   PRINTF(" local/remote port %u/%u\n",
         UIP_HTONS(client_conn->lport), UIP_HTONS(client_conn->rport));
+
+  #if WITH_ORCHESTRA
+    orchestra_init();
+  #endif /* WITH_ORCHESTRA */
 
   while(1) {
     PROCESS_YIELD();
