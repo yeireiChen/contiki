@@ -55,7 +55,11 @@ public class SensorData implements SensorInfo {
   public SensorData(Node node, int[] values, long systemTime) {
     this.node = node;
     this.values = values;
-    this.nodeTime = ((values[TIMESTAMP1] << 16) + values[TIMESTAMP2]) * 1000L;
+    long nodeTime = ((values[TIMESTAMP1] << 16) + values[TIMESTAMP2]) * 1000L;
+    while (nodeTime > 131072000) {
+      nodeTime -= 131072000;
+    }
+    this.nodeTime = nodeTime;
     this.systemTime = systemTime;
     this.seqno = values[SEQNO];
   }
