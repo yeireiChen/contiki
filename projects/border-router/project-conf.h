@@ -32,8 +32,9 @@
 #define PROJECT_ROUTER_CONF_H_
 
 #ifndef WITH_NON_STORING
-#define WITH_NON_STORING 0 /* Set this to run with non-storing mode */
+#define WITH_NON_STORING 1 /* Set this to run with non-storing mode */
 #endif /* WITH_NON_STORING */
+
 
 #if WITH_NON_STORING
 #undef RPL_NS_CONF_LINK_NUM

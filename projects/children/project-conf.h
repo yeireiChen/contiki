@@ -48,6 +48,9 @@
    #define IEEE802154_CONF_PANID          0xABCD
  */
 
+#define RPL_WITH_NON_STORING 1
+#define WITH_NON_STORING 1
+
 /* IP buffer size must match all other hops, in particular the border router. */
 #undef UIP_CONF_BUFFER_SIZE
 #define UIP_CONF_BUFFER_SIZE           1280
@@ -63,7 +66,7 @@
 #define UIP_CONF_TCP                   0
 
 #undef NETSTACK_CONF_MAC
-#define NETSTACK_CONF_MAC     nullmac_driver
+#define NETSTACK_CONF_MAC     tschmac_driver
 
 /* Increase rpl-border-router IP-buffer when using more than 64. */
 #undef REST_MAX_CHUNK_SIZE
@@ -99,7 +102,7 @@
 #define RPL_CONF_OF                    rpl_of0
 
 /* Enable client-side support for COAP observe */
-#define COAP_OBSERVE_CLIENT 1
+#define COAP_OBSERVE_CLIENT 0
 
 #include "../00-common/tsch-project-conf.h"
 

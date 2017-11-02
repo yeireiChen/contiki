@@ -49,26 +49,28 @@
 #include "dev/button-sensor.h"
 #include "dev/slip.h"
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
-#define DEBUG DEBUG_NONE
+#define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
 
 static uip_ipaddr_t prefix;
 static uint8_t prefix_set;
 
 PROCESS(border_router_process, "Border router process");
+PROCESS(node_process, "RPL Node");
 
 #if WEBSERVER==0
 /* No webserver */
-AUTOSTART_PROCESSES(&border_router_process);
+AUTOSTART_PROCESSES(&border_router_process, &node_process);
 #elif WEBSERVER>1
 /* Use an external webserver application */
 #include "webserver-nogui.h"
-AUTOSTART_PROCESSES(&border_router_process,&webserver_nogui_process);
+AUTOSTART_PROCESSES(&border_router_process,&webserver_nogui_process, &node_process);
 #else
 /* Use simple webserver with only one page for minimum footprint.
  * Multiple connections can result in interleaved tcp segments since
@@ -105,7 +107,7 @@ PROCESS_THREAD(webserver_nogui_process, ev, data)
 
   PROCESS_END();
 }
-AUTOSTART_PROCESSES(&border_router_process,&webserver_nogui_process);
+AUTOSTART_PROCESSES(&border_router_process,&webserver_nogui_process, &node_process);
 
 static const char *TOP = "<html><head><title>ContikiRPL</title></head><body>\n";
 static const char *BOTTOM = "</body></html>\n";
@@ -453,3 +455,100 @@ PROCESS_THREAD(border_router_process, ev, data)
   PROCESS_END();
 }
 /*---------------------------------------------------------------------------*/
+
+
+
+/*---------------------------------------------------------------------------*/
+static void
+print_network_status(void)
+{
+  int i;
+  uint8_t state;
+  uip_ds6_defrt_t *default_route;
+#if RPL_WITH_STORING
+  uip_ds6_route_t *route;
+#endif /* RPL_WITH_STORING */
+#if RPL_WITH_NON_STORING
+  rpl_ns_node_t *link;
+#endif /* RPL_WITH_NON_STORING */
+
+  PRINTF("--- Network status ---\n");
+
+  /* Our IPv6 addresses */
+  PRINTF("- Server IPv6 addresses:\n");
+  for(i = 0; i < UIP_DS6_ADDR_NB; i++) {
+    state = uip_ds6_if.addr_list[i].state;
+    if(uip_ds6_if.addr_list[i].isused &&
+       (state == ADDR_TENTATIVE || state == ADDR_PREFERRED)) {
+      PRINTF("-- ");
+      PRINT6ADDR(&uip_ds6_if.addr_list[i].ipaddr);
+      PRINTF("\n");
+    }
+  }
+
+  /* Our default route */
+  PRINTF("- Default route:\n");
+  default_route = uip_ds6_defrt_lookup(uip_ds6_defrt_choose());
+  if(default_route != NULL) {
+    PRINTF("-- ");
+    PRINT6ADDR(&default_route->ipaddr);
+    PRINTF(" (lifetime: %lu seconds)\n", (unsigned long)default_route->lifetime.interval);
+  } else {
+    PRINTF("-- None\n");
+  }
+
+#if RPL_WITH_STORING
+  /* Our routing entries */
+  PRINTF("- Routing entries (%u in total):\n", uip_ds6_route_num_routes());
+  route = uip_ds6_route_head();
+  while(route != NULL) {
+    PRINTF("-- ");
+    PRINT6ADDR(&route->ipaddr);
+    PRINTF(" via ");
+    PRINT6ADDR(uip_ds6_route_nexthop(route));
+    PRINTF(" (lifetime: %lu seconds)\n", (unsigned long)route->state.lifetime);
+    route = uip_ds6_route_next(route);
+  }
+#endif
+
+#if RPL_WITH_NON_STORING
+  /* Our routing links */
+  PRINTF("- Routing links (%u in total):\n", rpl_ns_num_nodes());
+  link = rpl_ns_node_head();
+  while(link != NULL) {
+    uip_ipaddr_t child_ipaddr;
+    uip_ipaddr_t parent_ipaddr;
+    rpl_ns_get_node_global_addr(&child_ipaddr, link);
+    rpl_ns_get_node_global_addr(&parent_ipaddr, link->parent);
+    PRINTF("-- ");
+    PRINT6ADDR(&child_ipaddr);
+    if(link->parent == NULL) {
+      memset(&parent_ipaddr, 0, sizeof(parent_ipaddr));
+      PRINTF(" --- DODAG root ");
+    } else {
+      PRINTF(" to ");
+      PRINT6ADDR(&parent_ipaddr);
+    }
+    PRINTF(" (lifetime: %lu seconds)\n", (unsigned long)link->lifetime);
+    link = rpl_ns_node_next(link);
+  }
+#endif
+
+  PRINTF("----------------------\n");
+}
+
+PROCESS_THREAD(node_process, ev, data)
+{
+  static struct etimer etaa;
+  PROCESS_BEGIN();
+
+  etimer_set(&etaa, CLOCK_SECOND * 60);
+  while(1) {
+    print_network_status();
+    PROCESS_YIELD_UNTIL(etimer_expired(&etaa));
+    etimer_reset(&etaa);
+  }
+
+  PROCESS_END();
+}
+
