@@ -65,6 +65,8 @@
 #define PRINTLLADDR(addr)
 #endif
 
+#include "dev/leds.h"
+
 /*
  * Resources to be activated need to be imported through the extern keyword.
  * The build system automatically compiles the resources in the corresponding sub-directory.
@@ -78,9 +80,11 @@ extern resource_t
 //   res_event,
 //   res_sub,
 //   res_b1_sep_b2;
-// #if PLATFORM_HAS_LEDS
-// extern resource_t res_leds, res_toggle;
-// #endif
+  extern resource_t res_toggle;
+#if PLATFORM_HAS_LEDS
+  #warning i have LED
+
+#endif
 // #if PLATFORM_HAS_LIGHT
 // #include "dev/light-sensor.h"
 // extern resource_t res_light;
@@ -108,7 +112,8 @@ extern resource_t res_sht11;
 
 PROCESS(er_example_server, "Erbium Example Server");
 PROCESS(node_process, "RPL Node");
-AUTOSTART_PROCESSES(&er_example_server, &node_process);
+// AUTOSTART_PROCESSES(&er_example_server, &node_process);
+AUTOSTART_PROCESSES(&er_example_server);
 
 PROCESS_THREAD(er_example_server, ev, data)
 {
@@ -117,7 +122,7 @@ PROCESS_THREAD(er_example_server, ev, data)
   PROCESS_PAUSE();
 
   PRINTF("Starting Erbium Example Server\n");
-
+leds_toggle(LEDS_ALL);
 #ifdef RF_CHANNEL
   PRINTF("RF channel: %u\n", RF_CHANNEL);
 #endif
@@ -146,10 +151,11 @@ PROCESS_THREAD(er_example_server, ev, data)
 // /*  rest_activate_resource(&res_event, "sensors/button"); */
 // /*  rest_activate_resource(&res_sub, "test/sub"); */
 // /*  rest_activate_resource(&res_b1_sep_b2, "test/b1sepb2"); */
-// #if PLATFORM_HAS_LEDS
+  rest_activate_resource(&res_toggle, "actuators/toggle");
+#if PLATFORM_HAS_LEDS
 // /*  rest_activate_resource(&res_leds, "actuators/leds"); */
-//   rest_activate_resource(&res_toggle, "actuators/toggle");
-// #endif
+  
+#endif
 // #if PLATFORM_HAS_LIGHT
 //   rest_activate_resource(&res_light, "sensors/light"); 
 //   SENSORS_ACTIVATE(light_sensor);  
