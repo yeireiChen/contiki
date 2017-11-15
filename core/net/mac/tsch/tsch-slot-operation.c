@@ -398,6 +398,8 @@ update_neighbor_state(struct tsch_neighbor *n, struct tsch_packet *p,
   return in_queue;
 }
 /*---------------------------------------------------------------------------*/
+
+#include "dev/leds.h"
 /**
  * This function turns on the radio. Its semantics is dependent on
  * the value of TSCH_RADIO_ON_DURING_TIMESLOT constant:
@@ -425,6 +427,7 @@ tsch_radio_on(enum tsch_radio_state_on_cmd command)
     break;
   }
   if(do_it) {
+    leds_on(LEDS_ALL);
     NETSTACK_RADIO.on();
   }
 }
@@ -456,6 +459,7 @@ tsch_radio_off(enum tsch_radio_state_off_cmd command)
     break;
   }
   if(do_it) {
+    leds_off(LEDS_ALL);
     NETSTACK_RADIO.off();
   }
 }

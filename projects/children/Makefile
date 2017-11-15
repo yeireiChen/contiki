@@ -15,6 +15,9 @@ REST_RESOURCES_FILES = $(notdir $(shell find $(REST_RESOURCES_DIR) -name '*.c'))
 PROJECTDIRS += $(REST_RESOURCES_DIR)
 PROJECT_SOURCEFILES += $(REST_RESOURCES_FILES)
 
+# add observe
+PROJECT_SOURCEFILES += er-observe-client.c
+
 # REST Engine shall use Erbium CoAP implementation
 APPS += er-coap
 APPS += rest-engine

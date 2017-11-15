@@ -53,6 +53,8 @@
 #include "dev/button-sensor.h"
 #endif
 
+#include "er-observe-client.h"
+
 #define DEBUG 1
 #if DEBUG
 #include <stdio.h>
@@ -76,7 +78,7 @@ extern resource_t
 //   res_mirror,
 //   res_chunks,
 //   res_separate,
-//   res_push,
+extern resource_t res_push;
 //   res_event,
 //   res_sub,
 //   res_b1_sep_b2;
@@ -113,7 +115,7 @@ extern resource_t res_sht11;
 PROCESS(er_example_server, "Erbium Example Server");
 PROCESS(node_process, "RPL Node");
 // AUTOSTART_PROCESSES(&er_example_server, &node_process);
-AUTOSTART_PROCESSES(&er_example_server);
+AUTOSTART_PROCESSES(&er_example_server, &er_example_observe_client);
 
 PROCESS_THREAD(er_example_server, ev, data)
 {
@@ -147,7 +149,7 @@ leds_toggle(LEDS_ALL);
 /*  rest_activate_resource(&res_mirror, "debug/mirror"); */
 /*  rest_activate_resource(&res_chunks, "test/chunks"); */
 /*  rest_activate_resource(&res_separate, "test/separate"); */
-//   rest_activate_resource(&res_push, "test/push");
+  rest_activate_resource(&res_push, "test/push");
 // /*  rest_activate_resource(&res_event, "sensors/button"); */
 // /*  rest_activate_resource(&res_sub, "test/sub"); */
 // /*  rest_activate_resource(&res_b1_sep_b2, "test/b1sepb2"); */

@@ -50,6 +50,8 @@
 #include "dev/slip.h"
 
 
+#include "dev/leds.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -108,6 +110,7 @@ PROCESS_THREAD(webserver_nogui_process, ev, data)
   PROCESS_END();
 }
 AUTOSTART_PROCESSES(&border_router_process,&webserver_nogui_process, &node_process);
+// AUTOSTART_PROCESSES(&border_router_process,&webserver_nogui_process);
 
 static const char *TOP = "<html><head><title>ContikiRPL</title></head><body>\n";
 static const char *BOTTOM = "</body></html>\n";
@@ -426,7 +429,7 @@ PROCESS_THREAD(border_router_process, ev, data)
      cpu will interfere with establishing the SLIP connection */
   NETSTACK_MAC.off(1);
 #endif
-
+leds_toggle(LEDS_ALL);
   /* Request prefix until it has been received */
   while(!prefix_set) {
     etimer_set(&et, CLOCK_SECOND);
@@ -459,9 +462,14 @@ PROCESS_THREAD(border_router_process, ev, data)
 
 
 /*---------------------------------------------------------------------------*/
+#include "core/net/mac/tsch/tsch-private.h"
+extern struct tsch_asn_t tsch_current_asn;
+
+
 static void
 print_network_status(void)
 {
+
   int i;
   uint8_t state;
   uip_ds6_defrt_t *default_route;
@@ -473,6 +481,8 @@ print_network_status(void)
 #endif /* RPL_WITH_NON_STORING */
 
   PRINTF("--- Network status ---\n");
+
+  PRINTF("TSCH: {asn-%x.%lx link-NULL} \n", tsch_current_asn.ms1b, tsch_current_asn.ls4b);
 
   /* Our IPv6 addresses */
   PRINTF("- Server IPv6 addresses:\n");
@@ -533,7 +543,7 @@ print_network_status(void)
     link = rpl_ns_node_next(link);
   }
 #endif
-
+  leds_toggle(LEDS_ALL);
   PRINTF("----------------------\n");
 }
 
@@ -544,9 +554,9 @@ PROCESS_THREAD(node_process, ev, data)
 
   etimer_set(&etaa, CLOCK_SECOND * 60);
   while(1) {
-    print_network_status();
     PROCESS_YIELD_UNTIL(etimer_expired(&etaa));
     etimer_reset(&etaa);
+    print_network_status();
   }
 
   PROCESS_END();

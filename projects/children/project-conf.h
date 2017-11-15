@@ -83,10 +83,10 @@
 #define COAP_MAX_OPEN_TRANSACTIONS     4
 
 /* Must be <= open transactions, default is COAP_MAX_OPEN_TRANSACTIONS-1. */
-/*
+
    #undef COAP_MAX_OBSERVERS
    #define COAP_MAX_OBSERVERS             2
- */
+ 
 
 /* Filtering .well-known/core per query can be disabled to save space. */
 #undef COAP_LINK_FORMAT_FILTERING
@@ -102,7 +102,7 @@
 #define RPL_CONF_OF                    rpl_of0
 
 /* Enable client-side support for COAP observe */
-#define COAP_OBSERVE_CLIENT 0
+#define COAP_OBSERVE_CLIENT 1
 
 #include "../00-common/tsch-project-conf.h"
 
