@@ -427,7 +427,7 @@ tsch_radio_on(enum tsch_radio_state_on_cmd command)
     break;
   }
   if(do_it) {
-    leds_on(LEDS_ALL);
+    leds_on(LEDS_RED);
     NETSTACK_RADIO.on();
   }
 }
@@ -459,7 +459,7 @@ tsch_radio_off(enum tsch_radio_state_off_cmd command)
     break;
   }
   if(do_it) {
-    leds_off(LEDS_ALL);
+    leds_off(LEDS_RED);
     NETSTACK_RADIO.off();
   }
 }

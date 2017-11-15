@@ -115,7 +115,7 @@ extern resource_t res_sht11;
 PROCESS(er_example_server, "Erbium Example Server");
 PROCESS(node_process, "RPL Node");
 // AUTOSTART_PROCESSES(&er_example_server, &node_process);
-AUTOSTART_PROCESSES(&er_example_server, &er_example_observe_client);
+AUTOSTART_PROCESSES(&er_example_server, &node_process, &er_example_observe_client);
 
 PROCESS_THREAD(er_example_server, ev, data)
 {
@@ -124,7 +124,7 @@ PROCESS_THREAD(er_example_server, ev, data)
   PROCESS_PAUSE();
 
   PRINTF("Starting Erbium Example Server\n");
-leds_toggle(LEDS_ALL);
+  leds_toggle(LEDS_GREEN);
 #ifdef RF_CHANNEL
   PRINTF("RF channel: %u\n", RF_CHANNEL);
 #endif
@@ -206,7 +206,6 @@ leds_toggle(LEDS_ALL);
 static void
 print_network_status(void)
 {
-  PRINTF("FFFFFFFFFFFF");
   int i;
   uint8_t state;
   uip_ds6_defrt_t *default_route;
@@ -278,7 +277,7 @@ print_network_status(void)
     link = rpl_ns_node_next(link);
   }
 #endif
-
+  leds_toggle(LEDS_GREEN);
   PRINTF("----------------------\n");
 }
 
@@ -289,9 +288,9 @@ PROCESS_THREAD(node_process, ev, data)
 
   etimer_set(&etaa, CLOCK_SECOND * 60);
   while(1) {
-    print_network_status();
     PROCESS_YIELD_UNTIL(etimer_expired(&etaa));
     etimer_reset(&etaa);
+    print_network_status();
   }
 
   PROCESS_END();

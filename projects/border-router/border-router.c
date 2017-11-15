@@ -429,7 +429,7 @@ PROCESS_THREAD(border_router_process, ev, data)
      cpu will interfere with establishing the SLIP connection */
   NETSTACK_MAC.off(1);
 #endif
-leds_toggle(LEDS_ALL);
+  leds_toggle(LEDS_GREEN);
   /* Request prefix until it has been received */
   while(!prefix_set) {
     etimer_set(&et, CLOCK_SECOND);
@@ -543,7 +543,7 @@ print_network_status(void)
     link = rpl_ns_node_next(link);
   }
 #endif
-  leds_toggle(LEDS_ALL);
+  leds_toggle(LEDS_GREEN);
   PRINTF("----------------------\n");
 }
 
