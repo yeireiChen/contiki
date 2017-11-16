@@ -16,7 +16,7 @@ PROJECTDIRS += $(REST_RESOURCES_DIR)
 PROJECT_SOURCEFILES += $(REST_RESOURCES_FILES)
 
 # add observe
-PROJECT_SOURCEFILES += er-observe-client.c
+# PROJECT_SOURCEFILES += er-observe-client.c
 
 # REST Engine shall use Erbium CoAP implementation
 APPS += er-coap

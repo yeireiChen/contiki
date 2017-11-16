@@ -53,7 +53,6 @@
 #include "dev/button-sensor.h"
 #endif
 
-#include "er-observe-client.h"
 
 #define DEBUG 1
 #if DEBUG
@@ -114,8 +113,7 @@ extern resource_t res_sht11;
 
 PROCESS(er_example_server, "Erbium Example Server");
 PROCESS(node_process, "RPL Node");
-// AUTOSTART_PROCESSES(&er_example_server, &node_process);
-AUTOSTART_PROCESSES(&er_example_server, &node_process, &er_example_observe_client);
+AUTOSTART_PROCESSES(&er_example_server, &node_process);
 
 PROCESS_THREAD(er_example_server, ev, data)
 {
