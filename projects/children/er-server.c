@@ -84,11 +84,8 @@ extern resource_t res_push;
 //   res_event,
 //   res_sub,
 //   res_b1_sep_b2;
-  extern resource_t res_toggle;
-#if PLATFORM_HAS_LEDS
-  #warning i have LED
-
-#endif
+extern resource_t res_toggle;
+extern resource_t res_collect;
 // #if PLATFORM_HAS_LIGHT
 // #include "dev/light-sensor.h"
 // extern resource_t res_light;
@@ -155,6 +152,9 @@ PROCESS_THREAD(er_example_server, ev, data)
 // /*  rest_activate_resource(&res_sub, "test/sub"); */
 // /*  rest_activate_resource(&res_b1_sep_b2, "test/b1sepb2"); */
   rest_activate_resource(&res_toggle, "actuators/toggle");
+
+  rest_activate_resource(&res_collect, "g/collect");
+
 #if PLATFORM_HAS_LEDS
 // /*  rest_activate_resource(&res_leds, "actuators/leds"); */
   
