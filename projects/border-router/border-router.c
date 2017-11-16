@@ -57,6 +57,10 @@
 #include <string.h>
 #include <ctype.h>
 
+#if WITH_ORCHESTRA
+#include "orchestra.h"
+#endif
+
 #define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
 
@@ -441,6 +445,9 @@ PROCESS_THREAD(border_router_process, ev, data)
    * Since we are the DAG root, reception delays would constrain mesh throughbut.
    */
   NETSTACK_MAC.on();
+#if WITH_ORCHESTRA
+  orchestra_init();
+#endif
   /* NETSTACK_MAC.off(1); for ContikiMAC */
 
 #if DEBUG || 1

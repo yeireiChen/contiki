@@ -120,6 +120,31 @@
 #undef TSCH_CONF_MAX_EB_PERIOD
 #define TSCH_CONF_MAX_EB_PERIOD (50 * CLOCK_SECOND)
 
+
+
+/*******************************************************/
+/*************** Enable Orchestra **********************/
+/*******************************************************/
+/* Set to run orchestra */
+#ifndef WITH_ORCHESTRA
+#define WITH_ORCHESTRA 1
+#endif /* WITH_ORCHESTRA */
+
+
+#if WITH_ORCHESTRA
+
+/* See apps/orchestra/README.md for more Orchestra configuration options */
+#define TSCH_SCHEDULE_CONF_WITH_6TISCH_MINIMAL 0 /* No 6TiSCH minimal schedule */
+#define TSCH_CONF_WITH_LINK_SELECTOR 1 /* Orchestra requires per-packet link selection */
+/* Orchestra callbacks */
+#define TSCH_CALLBACK_NEW_TIME_SOURCE orchestra_callback_new_time_source
+#define TSCH_CALLBACK_PACKET_READY orchestra_callback_packet_ready
+#define NETSTACK_CONF_ROUTING_NEIGHBOR_ADDED_CALLBACK orchestra_callback_child_added
+#define NETSTACK_CONF_ROUTING_NEIGHBOR_REMOVED_CALLBACK orchestra_callback_child_removed
+
+#endif /* WITH_ORCHESTRA */
+
+
 #if CONTIKI_TARGET_Z1
 /* Save some space to fit the limited RAM of the z1 */
 #undef UIP_CONF_TCP

@@ -53,6 +53,9 @@
 #include "dev/button-sensor.h"
 #endif
 
+#if WITH_ORCHESTRA
+#include "orchestra.h"
+#endif
 
 #define DEBUG 1
 #if DEBUG
@@ -178,7 +181,9 @@ PROCESS_THREAD(er_example_server, ev, data)
 //   SENSORS_ACTIVATE(sht11_sensor);  
 // #endif
 // */
-
+#if WITH_ORCHESTRA
+  orchestra_init();
+#endif
   /* Define application-specific events here. */
   while(1) {
     PROCESS_WAIT_EVENT();

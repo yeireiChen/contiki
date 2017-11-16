@@ -21,6 +21,7 @@ PROJECT_SOURCEFILES += $(REST_RESOURCES_FILES)
 # REST Engine shall use Erbium CoAP implementation
 APPS += er-coap
 APPS += rest-engine
+APPS += orchestra
 
 CONTIKI_WITH_IPV6 = 1
 include $(CONTIKI)/Makefile.include
