@@ -47,7 +47,7 @@ static int8_t event_threshold = 20;
 static int32_t event_threshold_last_change = 0;
 
 /* Record the packet have been generated. (Server perspective) */
-static int8_t packet_counter = 0;
+static int32_t packet_counter = 0;
 
 static void
 res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
