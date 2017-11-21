@@ -180,4 +180,11 @@
        || CONTIKI_TARGET_OPENMOTE_CC2538 */
 
 
+/* Needed for CC2538 platforms only */
+/* For TSCH we have to use the more accurate crystal oscillator
+ * by default the RC oscillator is activated */
+#undef SYS_CTRL_CONF_OSC32K_USE_XTAL
+#define SYS_CTRL_CONF_OSC32K_USE_XTAL 1
+
+
 #endif /* __TSCH_PROJECT_CONF_H__ */
