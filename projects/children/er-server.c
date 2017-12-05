@@ -86,6 +86,8 @@ extern resource_t res_push;
 //   res_b1_sep_b2;
 extern resource_t res_toggle;
 extern resource_t res_collect;
+
+extern resource_t res_bcollect;
 // #if PLATFORM_HAS_LIGHT
 // #include "dev/light-sensor.h"
 // extern resource_t res_light;
@@ -154,6 +156,8 @@ PROCESS_THREAD(er_example_server, ev, data)
   rest_activate_resource(&res_toggle, "actuators/toggle");
 
   rest_activate_resource(&res_collect, "g/collect");
+  
+  rest_activate_resource(&res_bcollect, "g/bcollect");
 
 #if PLATFORM_HAS_LEDS
 // /*  rest_activate_resource(&res_leds, "actuators/leds"); */
@@ -206,6 +210,10 @@ PROCESS_THREAD(er_example_server, ev, data)
 
 
 /*---------------------------------------------------------------------------*/
+#include "core/net/mac/tsch/tsch-private.h"
+extern struct tsch_asn_t tsch_current_asn;
+
+
 static void
 print_network_status(void)
 {
@@ -220,6 +228,8 @@ print_network_status(void)
 #endif /* RPL_WITH_NON_STORING */
 
   PRINTF("--- Network status ---\n");
+
+  PRINTF("TSCH: {asn-%x.%lx link-NULL} \n", tsch_current_asn.ms1b, tsch_current_asn.ls4b);
 
   /* Our IPv6 addresses */
   PRINTF("- Server IPv6 addresses:\n");
