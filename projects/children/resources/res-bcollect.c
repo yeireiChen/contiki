@@ -10,6 +10,7 @@
 #include "er-coap.h"
 
 #include "core/net/rpl/rpl.h"
+#include "core/net/link-stats.h"
 
 #define DEBUG 1
 #if DEBUG
@@ -40,16 +41,16 @@ PERIODIC_RESOURCE(res_bcollect,
 /*
  * Use local resource state that is accessed by res_get_handler() and altered by res_periodic_handler() or PUT or POST.
  */
-static int32_t event_counter = 0;
+static uint32_t event_counter = 0;
 
 /* inter-packet time we generate a packet to send to observer */
-static int8_t event_threshold = 20;
+static uint8_t event_threshold = 20;
 
 /* record last change event threshold's event_counter */
-static int32_t event_threshold_last_change = 0;
+static uint32_t event_threshold_last_change = 0;
 
 /* Record the packet have been generated. (Server perspective) */
-static int32_t packet_counter = 0;
+static uint32_t packet_counter = 0;
 
 static void
 res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
@@ -59,15 +60,80 @@ res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferr
    * Otherwise the requests must be stored with the observer list and passed by REST.notify_subscribers().
    * This would be a TODO in the corresponding files in contiki/apps/erbium/!
    */
+
+
+  struct 
+  {
+    uint8_t flag[2];
+    // padding 2
+    uint32_t event_counter;
+    uint8_t event_threshold;
+    // padding 3
+    uint32_t event_threshold_last_change;
+    uint32_t packet_counter;
+    unsigned char parent_address[2];
+    uint16_t rank;
+    uint16_t parnet_link_etx;
+    int16_t parent_link_rssi;
+    uint8_t end_flag[2];
+  } message;
+
+  memset(&message, 0, sizeof(message));
+
+  message.flag[0] = 0x54;
+  message.flag[1] = 0x66;
+  message.end_flag[0] = 0xf0;
+  message.end_flag[1] = 0xff;
+
+  message.event_counter = event_counter;
+  message.event_threshold = event_threshold;
+  message.event_threshold_last_change = event_threshold_last_change;
+  message.packet_counter = packet_counter;
+
+
+
+  uint8_t packet_length = 0;
+  rpl_dag_t *dag;
+  rpl_parent_t *preferred_parent;
+  linkaddr_t parent;
+  linkaddr_copy(&parent, &linkaddr_null);
+  struct link_stats *parent_link_stats;
+
+
   PRINTF("I am collect res_get hanlder!\n");
   REST.set_header_content_type(response, REST.type.APPLICATION_OCTET_STREAM);
   REST.set_header_max_age(response, res_bcollect.periodic->period / CLOCK_SECOND);
 
-  uint8_t packet_length = 0;
+  
 
   // packet_counter
-  memcpy(buffer,&packet_counter, sizeof(packet_counter));
-  packet_counter += sizeof(packet_counter);
+  // memcpy(buffer,&packet_counter, sizeof(packet_counter));
+  // packet_counter += sizeof(packet_counter);
+
+  
+  dag = rpl_get_any_dag();
+  if(dag != NULL) {
+    preferred_parent = dag->preferred_parent;
+    if(preferred_parent != NULL) {
+      uip_ds6_nbr_t *nbr;
+      nbr = uip_ds6_nbr_lookup(rpl_get_parent_ipaddr(preferred_parent));
+      if(nbr != NULL) {
+        /* Use parts of the IPv6 address as the parent address, in reversed byte order. */
+        parent.u8[LINKADDR_SIZE - 1] = nbr->ipaddr.u8[sizeof(uip_ipaddr_t) - 2];
+        parent.u8[LINKADDR_SIZE - 2] = nbr->ipaddr.u8[sizeof(uip_ipaddr_t) - 1];
+        parent_link_stats = rpl_get_parent_link_stats(preferred_parent);
+        message.parnet_link_etx = parent_link_stats->etx;
+        message.parent_link_rssi = parent_link_stats->rssi;
+      }
+    }
+    message.rank = dag->rank;
+  } else {
+  }
+
+  message.parent_address[0] = parent.u8[LINKADDR_SIZE - 1];
+  message.parent_address[1] = parent.u8[LINKADDR_SIZE - 2];
+
+  memcpy(buffer, &message, sizeof(message));
 
   // rpl things
   // rpl_dag
@@ -77,9 +143,10 @@ res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferr
   // memcpy(buffer, rpl_parent_address, sizeof(rpl_parent_address));
   // packet_counter += sizeof(rpl_parent_address);
 
+
   
 
-  REST.set_response_payload(response, buffer, packet_length);
+  REST.set_response_payload(response, buffer, sizeof(message));
 
   // REST.set_response_payload(response, buffer, snprintf((char *)buffer, preferred_size, "[Collect] ec: %lu, et: %lu, lc, %lu, pc: %lu", event_counter, event_threshold, event_threshold_last_change,packet_counter));
 
@@ -94,7 +161,7 @@ res_post_handler(void *request, void *response, uint8_t *buffer, uint16_t prefer
   const char *threshold_c = NULL;
   int threshold = -1;
   if(REST.get_query_variable(request, "threshold", &threshold_c)) {
-    threshold = (int8_t)atoi(threshold_c);
+    threshold = (uint8_t)atoi(threshold_c);
   }
 
   if(threshold < 1) {
@@ -118,7 +185,7 @@ res_periodic_handler()
   ++event_counter;
 
   /* Will notify subscribers when inter-packet time is match */
-  if(event_counter % event_threshold == 0 && 0) {
+  if(event_counter % event_threshold == 0) {
     ++packet_counter;
     PRINTF("Generate a new packet!\n");
         
