@@ -52,6 +52,9 @@ static uint32_t event_threshold_last_change = 0;
 /* Record the packet have been generated. (Server perspective) */
 static uint32_t packet_counter = 0;
 
+#include "core/net/mac/tsch/tsch-private.h"
+extern struct tsch_asn_t tsch_current_asn;
+
 static void
 res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
 {
@@ -66,6 +69,8 @@ res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferr
   {
     uint8_t flag[2];
     // padding 2
+    uint32_t start_asn;
+    uint32_t end_asn;
     uint32_t event_counter;
     uint8_t event_threshold;
     // padding 3
@@ -89,6 +94,8 @@ res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferr
   message.event_threshold = event_threshold;
   message.event_threshold_last_change = event_threshold_last_change;
   message.packet_counter = packet_counter;
+
+  message.start_asn = tsch_current_asn.ls4b;
 
 
 
