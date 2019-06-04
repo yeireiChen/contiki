@@ -107,7 +107,7 @@ res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferr
   struct link_stats *parent_link_stats;
 
 
-  PRINTF("I am collect res_get hanlder!\n");
+  PRINTF("I am B_collect res_get hanlder!\n");
   REST.set_header_content_type(response, REST.type.APPLICATION_OCTET_STREAM);
   REST.set_header_max_age(response, res_bcollect.periodic->period / CLOCK_SECOND);
 
@@ -155,7 +155,7 @@ res_get_handler(void *request, void *response, uint8_t *buffer, uint16_t preferr
 
   REST.set_response_payload(response, buffer, sizeof(message));
 
-  // REST.set_response_payload(response, buffer, snprintf((char *)buffer, preferred_size, "[Collect] ec: %lu, et: %lu, lc, %lu, pc: %lu", event_counter, event_threshold, event_threshold_last_change,packet_counter));
+   //REST.set_response_payload(response, buffer, snprintf((char *)buffer, preferred_size, "[Collect] ec: %lu, et: %lu, lc, %lu, pc: %lu\n", event_counter, event_threshold, event_threshold_last_change,packet_counter));
 
   /* The REST.subscription_handler() will be called for observable resources by the REST framework. */
 }
@@ -194,7 +194,7 @@ res_periodic_handler()
   /* Will notify subscribers when inter-packet time is match */
   if(event_counter % event_threshold == 0) {
     ++packet_counter;
-    PRINTF("Generate a new packet!\n");
+    PRINTF("Generate a new packet! , %08x. \n",tsch_current_asn.ls4b);
         
     /* Notify the registered observers which will trigger the res_get_handler to create the response. */
     REST.notify_subscribers(&res_bcollect);

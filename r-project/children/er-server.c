@@ -75,43 +75,16 @@
  * Resources to be activated need to be imported through the extern keyword.
  * The build system automatically compiles the resources in the corresponding sub-directory.
  */
-extern resource_t
-  res_hello;
-//   res_mirror,
-//   res_chunks,
-//   res_separate,
-extern resource_t res_push;
-//   res_event,
-//   res_sub,
-//   res_b1_sep_b2;
+
 extern resource_t res_toggle;
-extern resource_t res_collect;
+//extern resource_t res_collect;
 
 extern resource_t res_bcollect;
 // #if PLATFORM_HAS_LIGHT
 // #include "dev/light-sensor.h"
 // extern resource_t res_light;
 // #endif
-// #if PLATFORM_HAS_BATTERY
-// #include "dev/battery-sensor.h"
-// extern resource_t res_battery;
-// #endif
-// #if PLATFORM_HAS_TEMPERATURE
-// #include "dev/temperature-sensor.h"
-// extern resource_t res_temperature;
-// #endif
-/*
-extern resource_t res_battery;
-#endif
-#if PLATFORM_HAS_RADIO
-#include "dev/radio-sensor.h"
-extern resource_t res_radio;
-#endif
-#if PLATFORM_HAS_SHT11
-#include "dev/sht11/sht11-sensor.h"
-extern resource_t res_sht11;
-#endif
-*/
+
 
 PROCESS(er_example_server, "Erbium Example Server");
 PROCESS(node_process, "RPL Node");
@@ -145,17 +118,9 @@ PROCESS_THREAD(er_example_server, ev, data)
    * WARNING: Activating twice only means alternate path, not two instances!
    * All static variables are the same for each URI path.
    */
-  rest_activate_resource(&res_hello, "test/hello");
-/*  rest_activate_resource(&res_mirror, "debug/mirror"); */
-/*  rest_activate_resource(&res_chunks, "test/chunks"); */
-/*  rest_activate_resource(&res_separate, "test/separate"); */
-  rest_activate_resource(&res_push, "test/push");
-// /*  rest_activate_resource(&res_event, "sensors/button"); */
-// /*  rest_activate_resource(&res_sub, "test/sub"); */
-// /*  rest_activate_resource(&res_b1_sep_b2, "test/b1sepb2"); */
   rest_activate_resource(&res_toggle, "actuators/toggle");
 
-  rest_activate_resource(&res_collect, "g/collect");
+  //rest_activate_resource(&res_collect, "g/collect");
   
   rest_activate_resource(&res_bcollect, "g/bcollect");
 
