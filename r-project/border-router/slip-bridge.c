@@ -45,7 +45,7 @@
 #include <string.h>
 
 #define UIP_IP_BUF        ((struct uip_ip_hdr *)&uip_buf[UIP_LLH_LEN])
-#define UIP_UDP_BUF       ((struct uip_udp_hdr *)&uip_buf[UIP_LLH_LEN])
+#define UIP_UDP_BUF       ((struct uip_udp_hdr *)&uip_buf[UIP_LLIPH_LEN])
 
 #define DEBUG DEBUG_PRINT
 #include "net/ip/uip-debug.h"
@@ -146,6 +146,11 @@ output(void)
       ((uint8_t *) (UIP_IP_BUF))[coap_packet_start_location + 9] = (tsch_current_asn.ls4b >> 8) & 0xff;
       ((uint8_t *) (UIP_IP_BUF))[coap_packet_start_location + 10] = (tsch_current_asn.ls4b >> 16) & 0xff;
       ((uint8_t *) (UIP_IP_BUF))[coap_packet_start_location + 11] = (tsch_current_asn.ls4b >> 24)& 0xff;
+
+      uint32_t startASN = ((uint8_t *) (UIP_IP_BUF))[coap_packet_start_location + 7] << 24 |
+                          ((uint8_t *) (UIP_IP_BUF))[coap_packet_start_location + 6] << 16 |
+                          ((uint8_t *) (UIP_IP_BUF))[coap_packet_start_location + 5] << 8 |
+                          ((uint8_t *) (UIP_IP_BUF))[coap_packet_start_location + 4];
       
       
       
@@ -161,6 +166,10 @@ output(void)
                                                      ((uint8_t *) (UIP_IP_BUF))[coap_packet_start_location + 9],
                                                      ((uint8_t *) (UIP_IP_BUF))[coap_packet_start_location + 10],
                                                      ((uint8_t *) (UIP_IP_BUF))[coap_packet_start_location + 11]);
+
+      PRINTF("\nSTART ASN Numbers:%08u\n",(unsigned int)startASN);
+      PRINTF("\nEND ASN Numbers:%08u\n",(unsigned int)tsch_current_asn.ls4b);
+      PRINTF("The_Packet_Latency_is :%u\n",(unsigned int)((tsch_current_asn.ls4b - startASN)) *10 );
 
 
       UIP_UDP_BUF->udpchksum = 0;
