@@ -940,6 +940,31 @@ send_packet(mac_callback_t sent, void *ptr)
              tsch_queue_packet_count(addr),
              p->header_len,
              queuebuf_datalen(p->qb));
+
+      int i;
+      int dataLen=queuebuf_datalen(p->qb);
+      int headLen = p->header_len;
+      PRINTF("TSCH : dataLen %u\n",dataLen);
+
+      /* check location for--bcollect(62,63)
+      for(i=0;i<dataLen;i++){
+        uint8_t data = ( (uint8_t *)queuebuf_dataptr(p->qb))[i];
+        PRINTF("%02x \t",data);
+        if((i%20)==0)
+          PRINTF("\n");
+      }*/
+
+  
+      
+
+      if(((uint8_t *)queuebuf_dataptr(p->qb))[62] ==0x54 && ( (uint8_t *)queuebuf_dataptr(p->qb))[63] == 0x66){
+
+        PRINTF("\nThis is bcollect data\n");
+      }
+      PRINTF("\n");
+
+
+
       (void)packet_count_before; /* Discard "variable set but unused" warning in case of TSCH_LOG_LEVEL of 0 */
     }
   }
